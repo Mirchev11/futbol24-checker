@@ -1,12 +1,15 @@
 package com.nb.futbol24checker.service;
 
+import com.nb.futbol24checker.model.FutbolResponse;
+
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 
 @Service
 @Slf4j
@@ -18,21 +21,17 @@ public class WebService {
 
     private final String getUrl = "https://www.futbol24.com/matchDayXml/?Day=";
 
-    public void makeGetRestCall(String date) {
-        log.info("============================================================");
-
-        log.info("Making a GET call to: {}", getUrl+date);
-        String response = template.getForObject(getUrl+date, String.class);
-        log.info("Response received is: ");
-        log.info(response);
-        log.info("Response end!");
-        log.info("============================================================");
+    public FutbolResponse makeGetRestCall(String date) {
+        System.out.println("====================================================================================");
+        System.out.println("Making a GET call to: " + getUrl+date);
+        FutbolResponse response = template.getForEntity(getUrl+date, FutbolResponse.class).getBody();
+        System.out.println("====================================================================================");
+        return response;
     }
-
 
     @PostConstruct
     private void generateRestTemplateForPost() {
-        template = builder.build();
+        template = builder.additionalMessageConverters( new MarshallingHttpMessageConverter()).build();
     }
 
 }
